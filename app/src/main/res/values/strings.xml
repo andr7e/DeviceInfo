@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MtkDeviceInfo</string>
+    <string name="engineer_mode">ENG</string>
+    <string name="get_info">GET</string>
+</resources>
