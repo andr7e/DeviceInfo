@@ -1,5 +1,6 @@
 package com.example.andre.myapplication;
 
+import com.example.andre.InfoUtils;
 import com.example.andre.androidshell.ShellExecuter;
 
 import android.content.ComponentName;
@@ -34,11 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String getDrivers(ShellExecuter se)
     {
-        String command = "ls cat /sys/bus/i2c/drivers";
-
-        String out = se.execute(command);
-
-        String[] list = out.split("\n");
+        String[] list = InfoUtils.getDriversList(se);
 
         HashMap<String,String> hm = new HashMap<String,String>();
 
@@ -96,72 +93,6 @@ public class MainActivity extends AppCompatActivity {
         return res;
     }
 
-    public String getPlatform()
-    {
-        return Build.HARDWARE;
-    }
-
-    public String getKernelVersion (ShellExecuter se)
-    {
-        String command = "cat /proc/version";
-
-        return se.execute(command);
-    }
-
-    public String getFlashName (ShellExecuter se)
-    {
-        String command = "cat /sys/class/mmc_host/mmc0/mmc0:0001/name";
-
-        return se.execute(command);
-    }
-
-    public String getCpufreq (ShellExecuter se)
-    {
-        String command = "cat /proc/cpufreq/cpufreq_freq";
-
-        return se.execute(command);
-    }
-
-    public String getRamType (ShellExecuter se)
-    {
-        String command = "cat /sys/bus/platform/drivers/ddr_type/ddr_type";
-
-        return se.execute(command);
-    }
-
-    /*
-    public String getPlatform2(ShellExecuter se)
-    {
-        String command = "cat /proc/cpuinfo";
-
-        String out = se.execute(command);
-
-        String[] list = out.split("\n");
-
-        //System.out.println(list);
-
-        HashMap<String,String> hm = new HashMap<String,String>();
-
-        for (String line : list)
-        {
-            String[] elementList = line.split(":");
-
-            if (elementList.length == 2)
-            {
-                String key   = elementList[0].trim();
-                String value = elementList[1].trim();
-
-                hm.put(key, value);
-            }
-        }
-
-        String platform = hm.get("Hardware");
-
-        //System.out.println(platform);
-
-        return platform;
-    }*/
-
     public int getScreenWidth ()
     {
         Display display = getWindowManager().getDefaultDisplay();
@@ -199,52 +130,26 @@ public class MainActivity extends AppCompatActivity {
         return String.format("%dx%d", height, width);
     }
 
-    /*
-    public String getDeviceName()
+    public void runApplication(String packageName, String activityName)
     {
-        String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
-
-        if (model.startsWith(manufacturer))
-        {
-            return model;
-        }
-        else
-        {
-            return manufacturer + " " + model;
-        }
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setComponent(new ComponentName(packageName,packageName + "." + activityName));
+        startActivity(intent);
     }
-
-
-    public String getModel()
-    {
-        return Build.MODEL;
-    }
-
-    public String getBrand()
-    {
-        return Build.BRAND;
-    }
-
-    public String getManufacturer()
-    {
-        return Build.MANUFACTURER;
-    }*/
 
     public void onOpenEngineerMode(View view)
     {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setComponent(new ComponentName("com.mediatek.engineermode","com.mediatek.engineermode.EngineerMode"));
-        startActivity(intent);
+        runApplication("com.mediatek.engineermode", "EngineerMode");
+    }
+
+    Pair<String, String> createObj (String key, String value)
+    {
+        return new Pair<String, String>(key, value);
     }
 
     public void onMyButtonClick(View view)
     {
         ShellExecuter exec = new ShellExecuter();
-
-        String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
-        String brand = Build.BRAND;
 
         String version = Build.VERSION.RELEASE;
         String api = Integer.toString(Build.VERSION.SDK_INT);
@@ -260,24 +165,23 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList< Pair<String, String> > objList = new ArrayList< Pair<String, String> >();
 
-        objList.add (new Pair<String, String>("Manufacturer", manufacturer));
-        objList.add (new Pair<String, String>("Model", model));
-        objList.add (new Pair<String, String>("Brand", brand));
+        objList.add (new Pair<String, String>("Manufacturer", InfoUtils.getManufacturer()));
+        objList.add (new Pair<String, String>("Model",        InfoUtils.getModel()));
+        objList.add (new Pair<String, String>("Brand",        InfoUtils.getBrand()));
 
         objList.add (new Pair<String, String>("Resolution", getResolution()));
 
-        objList.add (new Pair<String, String>("Platform", getPlatform()));
-        //objList.add (new Pair<String, String>("CPU freq", getCpufreq(exec)));
-        objList.add (new Pair<String, String>("RAM", getRamType(exec)));
+        objList.add (new Pair<String, String>("Platform",   InfoUtils.getPlatform()));
+        //objList.add (new Pair<String, String>("CPU freq", InfoUtils.getCpufreq(exec)));
+        objList.add (new Pair<String, String>("RAM",        InfoUtils.getRamType(exec)));
 
-        objList.add (new Pair<String, String>("Android Version", version));
-
-        objList.add (new Pair<String, String>("API", api));
+        objList.add (new Pair<String, String>("Android Version", InfoUtils.getAndroidVersion()));
+        objList.add (new Pair<String, String>("API",             InfoUtils.getAndroidAPI()));
 
         objList.add (new Pair<String, String>("Baseband", Build.getRadioVersion()));
 
-        objList.add (new Pair<String, String>("Kernel", getKernelVersion(exec)));
-        objList.add (new Pair<String, String>("Flash", getFlashName(exec)));
+        objList.add (new Pair<String, String>("Kernel", InfoUtils.getKernelVersion(exec)));
+        objList.add (new Pair<String, String>("Flash",  InfoUtils.getFlashName(exec)));
 
         for (int i = 0; i < objList.size(); i++)
         {
@@ -286,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
             TableRow row = new TableRow(this);
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             row.setLayoutParams(lp);
-
-            //int color = getResources().getColor(R.color.colorBackground);
 
             Context context = getApplicationContext();
             int color = ContextCompat.getColor(context, R.color.colorBackground);
@@ -312,44 +214,11 @@ public class MainActivity extends AppCompatActivity {
     {
         ShellExecuter exe = new ShellExecuter();
         //String command = "su -c cat /proc/cmdline";
-        //String command = "cat /proc/cpuinfo";
-
-        //String out = exe.execute(command);
-
-        String manufacturer = "Manufacturer:\n"  + Build.MANUFACTURER;
-        String model = "Model:\n"  +  Build.MODEL;
-        String brand = "Brand:\n"  + Build.BRAND;
-
-        String platform = "Platform:\n"  + getPlatform();
-        String cpufreq = "Freq:\n"  + getCpufreq(exe);
-        String raminfo = "RAM:\n"  + getRamType(exe);
-
-        String resolution = "Resolution:\n" + getResolution();
-        String verison = "Version:\n"  + Build.VERSION.RELEASE + "(" + Build.VERSION.SDK_INT + ")";
-
-        String baseband = "Baseband:\n"  + Build.getRadioVersion();
-
-        String kernelVerison = "Kernel:\n" + getKernelVersion(exe);
-        String flashName = "Flash:\n" + getFlashName(exe);
 
         String drivers = getDrivers(exe);
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(manufacturer).append("\n");
-        sb.append(model).append("\n");
-        sb.append(brand).append("\n");
-
-        sb.append(verison).append("\n");
-        sb.append(baseband).append("\n");
-        sb.append(flashName).append("\n");
-
-        sb.append(kernelVerison).append("\n");
-
-        sb.append(platform).append("\n");
-        sb.append(cpufreq).append("\n");
-        sb.append(raminfo).append("\n");
-        sb.append(resolution).append("\n");;
         sb.append(drivers);
 
         String out = sb.toString();
