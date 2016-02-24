@@ -2,4 +2,17 @@
     <string name="app_name">MtkDeviceInfo</string>
     <string name="engineer_mode">Engineer mode</string>
     <string name="get_info">Refresh</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="mi_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_use_root">Use root</string>
+
+    <string name="pref_description_use_root">Enable more information</string>
+
 </resources>
