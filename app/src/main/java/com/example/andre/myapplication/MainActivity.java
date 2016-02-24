@@ -12,7 +12,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Pair;
+import android.view.ContextMenu;
 import android.view.Display;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -87,7 +90,10 @@ public class MainActivity extends AppCompatActivity
     }
     public void onMyButtonClick(View view)
     {
-        fillInformatoin();
+        //fillInformatoin();
+
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     public void fillInformatoin()
@@ -155,6 +161,26 @@ public class MainActivity extends AppCompatActivity
             row.addView(text2);
 
             tableLayout.addView(row,i);
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.settings:
+                runApplication("com.mediatek.engineermode", "EngineerMode");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
