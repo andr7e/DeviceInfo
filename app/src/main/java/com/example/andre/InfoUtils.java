@@ -1,8 +1,12 @@
 package com.example.andre;
 
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.example.andre.androidshell.ShellExecuter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by andrey on 24.02.16.
@@ -93,5 +97,56 @@ public class InfoUtils
         String[] list = out.split("\n");
 
         return list;
+    }
+
+    public static HashMap<String,String> getDriversHash(ShellExecuter se)
+    {
+        String[] list = InfoUtils.getDriversList(se);
+
+        HashMap<String,String> hm = new HashMap<String,String>();
+
+        ArrayList<String> otherList = new ArrayList<String>();
+
+        for (String line : list)
+        {
+            String value = line.toUpperCase();
+
+            if (value.endsWith("AF"))
+            {
+                hm.put("Lens", line);
+            }
+            else if (value.startsWith("LIS") || value.startsWith("KXT") || value.startsWith("BMA"))
+            {
+                hm.put("Accelerometer", line);
+            }
+            else if (value.startsWith("EPL") || value.startsWith("APDS") || value.startsWith("STK") || value.startsWith("LTR"))
+            {
+                hm.put("Als/ps", line);
+            }
+            else if (value.startsWith("MPU"))
+            {
+                hm.put("Gyroscope", line);
+            }
+            else if (value.startsWith("MPU") || value.startsWith("AK") || value.startsWith("YAMAHA53"))
+            {
+                hm.put("Magnetometer", line);
+            }
+            else if (value.startsWith("BQ") || value.startsWith("FAN") || value.startsWith("NCP"))
+            {
+                hm.put("Charger", line);
+            }
+            else if (value.startsWith("GT") || value.startsWith("FT") || value.startsWith("S3") || value.startsWith("MTK-TPD"))
+            {
+                hm.put("Touchscreen", line);
+            }
+            else
+            {
+                otherList.add(line);
+            }
+
+            hm.put("Other", TextUtils.join("\n", otherList));
+        }
+
+        return hm;
     }
 }

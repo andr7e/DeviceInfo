@@ -6,15 +6,12 @@ import com.example.andre.androidshell.ShellExecuter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Pair;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.widget.TableLayout;
@@ -23,74 +20,16 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity
+{
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
-    public String getDrivers(ShellExecuter se)
-    {
-        String[] list = InfoUtils.getDriversList(se);
-
-        HashMap<String,String> hm = new HashMap<String,String>();
-
-        ArrayList<String> otherList = new ArrayList<String>();
-
-        for (String line : list)
-        {
-            String value = line.toUpperCase();
-
-            if (value.endsWith("AF"))
-            {
-                hm.put("Lens", line);
-            }
-            else if (value.startsWith("LIS") || value.startsWith("KXT") || value.startsWith("BMA"))
-            {
-                hm.put("Accelerometer", line);
-            }
-            else if (value.startsWith("EPL") || value.startsWith("APDS") || value.startsWith("STK") || value.startsWith("LTR"))
-            {
-                hm.put("Als/ps", line);
-            }
-            else if (value.startsWith("MPU"))
-            {
-                hm.put("Gyroscope", line);
-            }
-            else if (value.startsWith("MPU") || value.startsWith("AK") || value.startsWith("YAMAHA53"))
-            {
-                hm.put("Magnetometer", line);
-            }
-            else if (value.startsWith("BQ") || value.startsWith("FAN") || value.startsWith("NCP"))
-            {
-                hm.put("Charger", line);
-            }
-            else if (value.startsWith("GT") || value.startsWith("FT") || value.startsWith("S3") || value.startsWith("MTK-TPD"))
-            {
-                hm.put("Touchscreen", line);
-            }
-            else
-            {
-                otherList.add(line);
-            }
-
-            hm.put("Other", TextUtils.join("\n", otherList));
-        }
-
-        String res = "";
-
-        for (String key : hm.keySet())
-        {
-            String value = hm.get(key);
-
-            res += key + ":\n" + value + "\n";
-        }
-
-        return res;
+        fillInformatoin();
     }
 
     public int getScreenWidth ()
@@ -146,13 +85,14 @@ public class MainActivity extends AppCompatActivity {
     {
         return new Pair<String, String>(key, value);
     }
-
     public void onMyButtonClick(View view)
     {
-        ShellExecuter exec = new ShellExecuter();
+        fillInformatoin();
+    }
 
-        String version = Build.VERSION.RELEASE;
-        String api = Integer.toString(Build.VERSION.SDK_INT);
+    public void fillInformatoin()
+    {
+        ShellExecuter exec = new ShellExecuter();
 
         TableLayout tableLayout = (TableLayout)findViewById(R.id.tableLayout);
 
@@ -183,6 +123,15 @@ public class MainActivity extends AppCompatActivity {
         objList.add (new Pair<String, String>("Kernel", InfoUtils.getKernelVersion(exec)));
         objList.add (new Pair<String, String>("Flash",  InfoUtils.getFlashName(exec)));
 
+        HashMap<String,String>  hash = InfoUtils.getDriversHash(exec);
+
+        for (String key : hash.keySet())
+        {
+            String value = hash.get(key);
+
+            objList.add(new Pair<String, String>(key, value));
+        }
+
         for (int i = 0; i < objList.size(); i++)
         {
             Pair<String, String> obj = objList.get(i);
@@ -200,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
 
             TextView text2 = new TextView(this);
             text2.setText(obj.second);
-            //text2.setMaxLines(5);
             text2.setMaxWidth(screenWidthOffset);
 
             row.addView(text1);
@@ -208,24 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
             tableLayout.addView(row,i);
         }
-    }
-
-    public void onMyButtonClick2(View view)
-    {
-        ShellExecuter exe = new ShellExecuter();
-        //String command = "su -c cat /proc/cmdline";
-
-        String drivers = getDrivers(exe);
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(drivers);
-
-        String out = sb.toString();
-
-        TextView myTextView = (TextView)findViewById(R.id.textView);
-
-        myTextView.setText(out);
     }
 }
 
