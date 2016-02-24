@@ -13,6 +13,15 @@ import java.util.HashMap;
  */
 public class InfoUtils
 {
+    public static final String UNKNOWN       = "Other";
+    public static final String TOUCHPANEL    = "Touchscreen";
+    public static final String ACCELEROMETER = "Accelerometer";
+    public static final String ALSPS         = "Als/ps";
+    public static final String MAGNETOMETER  = "Magnetometer";
+    public static final String GYROSCOPE     = "Gyroscope";
+    public static final String CHARGER       = "Charger";
+    public static final String LENS          = "Lens";
+
     public static String getPlatform()
     {
         return Build.HARDWARE;
@@ -113,38 +122,38 @@ public class InfoUtils
 
             if (value.endsWith("AF"))
             {
-                hm.put("Lens", line);
+                hm.put(InfoUtils.LENS, line);
             }
             else if (value.startsWith("LIS") || value.startsWith("KXT") || value.startsWith("BMA"))
             {
-                hm.put("Accelerometer", line);
+                hm.put(InfoUtils.ACCELEROMETER, line);
             }
             else if (value.startsWith("EPL") || value.startsWith("APDS") || value.startsWith("STK") || value.startsWith("LTR"))
             {
-                hm.put("Als/ps", line);
+                hm.put(InfoUtils.ALSPS, line);
             }
             else if (value.startsWith("MPU"))
             {
-                hm.put("Gyroscope", line);
+                hm.put(InfoUtils.GYROSCOPE, line);
             }
             else if (value.startsWith("MPU") || value.startsWith("AK") || value.startsWith("YAMAHA53"))
             {
-                hm.put("Magnetometer", line);
+                hm.put(InfoUtils.MAGNETOMETER, line);
             }
             else if (value.startsWith("BQ") || value.startsWith("FAN") || value.startsWith("NCP"))
             {
-                hm.put("Charger", line);
+                hm.put(InfoUtils.CHARGER, line);
             }
             else if (value.startsWith("GT") || value.startsWith("FT") || value.startsWith("S3") || value.startsWith("MTK-TPD"))
             {
-                hm.put("Touchscreen", line);
+                hm.put(InfoUtils.TOUCHPANEL, line);
             }
             else
             {
                 otherList.add(line);
             }
 
-            hm.put("Other", TextUtils.join("\n", otherList));
+            hm.put(InfoUtils.UNKNOWN, TextUtils.join("\n", otherList));
         }
 
         return hm;

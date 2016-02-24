@@ -119,23 +119,38 @@ public class MainActivity extends AppCompatActivity
 
         objList.add (new Pair<String, String>("Platform",   InfoUtils.getPlatform()));
         //objList.add (new Pair<String, String>("CPU freq", InfoUtils.getCpufreq(exec)));
-        objList.add (new Pair<String, String>("RAM",        InfoUtils.getRamType(exec)));
 
         objList.add (new Pair<String, String>("Android Version", InfoUtils.getAndroidVersion()));
         objList.add (new Pair<String, String>("API",             InfoUtils.getAndroidAPI()));
 
-        objList.add (new Pair<String, String>("Baseband", Build.getRadioVersion()));
-
         objList.add (new Pair<String, String>("Kernel", InfoUtils.getKernelVersion(exec)));
+
+        objList.add (new Pair<String, String>("RAM",        InfoUtils.getRamType(exec)));
         objList.add (new Pair<String, String>("Flash",  InfoUtils.getFlashName(exec)));
+
+        objList.add (new Pair<String, String>("Baseband", Build.getRadioVersion()));
 
         HashMap<String,String>  hash = InfoUtils.getDriversHash(exec);
 
-        for (String key : hash.keySet())
-        {
-            String value = hash.get(key);
+        String[] keyList = {
+                InfoUtils.TOUCHPANEL,
+                InfoUtils.ACCELEROMETER,
+                InfoUtils.ALSPS,
+                InfoUtils.MAGNETOMETER,
+                InfoUtils.GYROSCOPE,
+                InfoUtils.CHARGER,
+                InfoUtils.LENS,
+                InfoUtils.UNKNOWN
+        };
 
-            objList.add(new Pair<String, String>(key, value));
+        for (String key : keyList)
+        {
+            if (hash.containsKey(key))
+            {
+                String value = hash.get(key);
+
+                objList.add(new Pair<String, String>(key, value));
+            }
         }
 
         for (int i = 0; i < objList.size(); i++)
