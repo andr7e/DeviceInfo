@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.example.andre.androidshell.ShellExecuter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,6 +22,9 @@ public class InfoUtils
     public static final String GYROSCOPE     = "Gyroscope";
     public static final String CHARGER       = "Charger";
     public static final String LENS          = "Lens";
+    public static final String CAMERA        = "Camera";
+    public static final String PMIC          = "PMIC";
+    public static final String RTC           = "RTC";
 
     public static String getPlatform()
     {
@@ -97,6 +101,7 @@ public class InfoUtils
         return se.execute(command);
     }
 
+    /*
     public static String[] getDriversList(ShellExecuter se)
     {
         String command = "ls cat /sys/bus/i2c/drivers";
@@ -107,12 +112,88 @@ public class InfoUtils
 
         return list;
     }
+    */
+
+    public static boolean isActiveDeviceI2C(File dir)
+    {
+        for (File file : dir.listFiles())
+        {
+            if (file.isDirectory())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static ArrayList<String> getDeviceList(File dir)
+    {
+        ArrayList<String> list = new ArrayList<String>();
+
+        for (File file : dir.listFiles())
+        {
+            if (file.isDirectory())
+            {
+                String name = file.getName();
+
+                if (isActiveDeviceI2C(file))
+                {
+                    list.add(name);
+                }
+            }
+        }
+        return list;
+    }
+
+    public static String[] getDriversList(ShellExecuter se)
+    {
+        String path = "/sys/bus/i2c/drivers/";
+
+        File dir = new File(path);
+
+        ArrayList<String>  list = getDeviceList(dir);
+
+        return list.toArray(new String[0]);
+    }
+
+    //
+
+    public static boolean isPrefixMatched (String[] prefixList, String value)
+    {
+        for (String prefix : prefixList)
+        {
+            if (value.startsWith(prefix))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public static HashMap<String,String> getDriversHash(ShellExecuter se)
     {
+        String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI"};
+        String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "MTK-TPD", "-TS"};
+        String[] chargerPrefixList = {"BQ", "FAN", "NCP", "CW"};
+        String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR"};
+        String[] pmicPrefixList    = {"ACT", "WM", "TPS"};
+
+        String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA"};
+        String[] magnetometerPrefixList   = {"AK", "YAMAHA53"};
+
         String[] list = InfoUtils.getDriversList(se);
 
         HashMap<String,String> hm = new HashMap<String,String>();
+
+        ArrayList<String> cameraList  = new ArrayList<String>();
+        ArrayList<String> touchList   = new ArrayList<String>();
+        ArrayList<String> chargerList = new ArrayList<String>();
+        ArrayList<String> alspsList   = new ArrayList<String>();
+        ArrayList<String> pmicList   = new ArrayList<String>();
+
+        ArrayList<String> accelerometerList = new ArrayList<String>();
+        ArrayList<String> magnetometerList = new ArrayList<String>();
 
         ArrayList<String> otherList = new ArrayList<String>();
 
@@ -124,37 +205,56 @@ public class InfoUtils
             {
                 hm.put(InfoUtils.LENS, line);
             }
-            else if (value.startsWith("LIS") || value.startsWith("KXT") || value.startsWith("BMA"))
+            else if (isPrefixMatched(alspsPrefixList, value))
             {
-                hm.put(InfoUtils.ACCELEROMETER, line);
+                alspsList.add(line);
             }
-            else if (value.startsWith("EPL") || value.startsWith("APDS") || value.startsWith("STK") || value.startsWith("LTR"))
+            else if (isPrefixMatched(accelerometerPrefixList, value))
             {
-                hm.put(InfoUtils.ALSPS, line);
+                accelerometerList.add(line);
             }
             else if (value.startsWith("MPU"))
             {
                 hm.put(InfoUtils.GYROSCOPE, line);
             }
-            else if (value.startsWith("MPU") || value.startsWith("AK") || value.startsWith("YAMAHA53"))
+            else if (isPrefixMatched(magnetometerPrefixList, value))
             {
-                hm.put(InfoUtils.MAGNETOMETER, line);
+                magnetometerList.add(line);
             }
-            else if (value.startsWith("BQ") || value.startsWith("FAN") || value.startsWith("NCP"))
+            else if (isPrefixMatched(chargerPrefixList, value))
             {
-                hm.put(InfoUtils.CHARGER, line);
+                chargerList.add(line);
             }
-            else if (value.startsWith("GT") || value.startsWith("FT") || value.startsWith("S3") || value.startsWith("MTK-TPD"))
+            else if (isPrefixMatched(touchPrefixList, value) || value.endsWith("-TS") || value.endsWith("-TPD"))
             {
-                hm.put(InfoUtils.TOUCHPANEL, line);
+                touchList.add(line);
+            }
+            else if (isPrefixMatched(pmicPrefixList, value))
+            {
+                pmicList.add(line);
+            }
+            else if (value.startsWith("RTC"))
+            {
+                hm.put(InfoUtils.RTC, line);
+            }
+            else if (isPrefixMatched(cameraPrefixList, value))
+            {
+                cameraList.add(line);
             }
             else
             {
                 otherList.add(line);
             }
-
-            hm.put(InfoUtils.UNKNOWN, TextUtils.join("\n", otherList));
         }
+
+        if ( ! cameraList.isEmpty())   hm.put(InfoUtils.CAMERA,     TextUtils.join("\n", cameraList));
+        if ( ! touchList.isEmpty())    hm.put(InfoUtils.TOUCHPANEL, TextUtils.join("\n", touchList));
+        if ( ! chargerList.isEmpty())  hm.put(InfoUtils.CHARGER,    TextUtils.join("\n", chargerList));
+        if ( ! accelerometerList.isEmpty()) hm.put(InfoUtils.ACCELEROMETER,   TextUtils.join("\n", accelerometerList));
+        if ( ! magnetometerList.isEmpty())  hm.put(InfoUtils.MAGNETOMETER,    TextUtils.join("\n", magnetometerList));
+        if ( ! alspsList.isEmpty())    hm.put(InfoUtils.ALSPS,      TextUtils.join("\n", alspsList));
+        if ( ! pmicList.isEmpty())     hm.put(InfoUtils.PMIC,       TextUtils.join("\n", pmicList));
+        if ( ! otherList.isEmpty())    hm.put(InfoUtils.UNKNOWN,    TextUtils.join("\n", otherList));
 
         return hm;
     }

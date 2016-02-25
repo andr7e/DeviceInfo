@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            System.out.print ("Can't run app");
+            System.out.println ("Can't run app");
         }
     }
 
@@ -135,21 +135,21 @@ public class MainActivity extends AppCompatActivity
         ArrayList< Pair<String, String> > objList = new ArrayList< Pair<String, String> >();
 
         addItem(objList, "Manufacturer", InfoUtils.getManufacturer());
-        addItem(objList, "Model",        InfoUtils.getModel());
-        addItem(objList, "Brand",        InfoUtils.getBrand());
+        addItem(objList, "Model", InfoUtils.getModel());
+        addItem(objList, "Brand", InfoUtils.getBrand());
 
         addItem(objList, "Resolution", getResolution());
 
-        addItem(objList, "Resolution", InfoUtils.getPlatform());
+        addItem(objList, "Platform", InfoUtils.getPlatform());
 
         //addItem(objList, "CPU freq",   InfoUtils.getCpufreq(exec));
 
-        addItem(objList, "Android Version",  InfoUtils.getAndroidVersion());
+        addItem(objList, "Android Version", InfoUtils.getAndroidVersion());
         addItem(objList, "API", InfoUtils.getAndroidAPI());
 
         addItem(objList, "Kernel", InfoUtils.getKernelVersion(exec));
 
-        addItem(objList, "RAM",   InfoUtils.getRamType(exec));
+        addItem(objList, "RAM", InfoUtils.getRamType(exec));
         addItem(objList, "Flash", InfoUtils.getFlashName(exec));
 
         addItem(objList, "Baseband", Build.getRadioVersion());
@@ -178,11 +178,14 @@ public class MainActivity extends AppCompatActivity
 
         String[] keyList = {
                 InfoUtils.TOUCHPANEL,
+                InfoUtils.PMIC,
+                InfoUtils.RTC,
                 InfoUtils.ACCELEROMETER,
                 InfoUtils.ALSPS,
                 InfoUtils.MAGNETOMETER,
                 InfoUtils.GYROSCOPE,
                 InfoUtils.CHARGER,
+                InfoUtils.CAMERA,
                 InfoUtils.LENS,
                 InfoUtils.UNKNOWN
         };
