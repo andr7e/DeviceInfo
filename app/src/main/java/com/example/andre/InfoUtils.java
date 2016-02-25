@@ -158,4 +158,27 @@ public class InfoUtils
 
         return hm;
     }
+
+    public static String getLcmName(String cmdline)
+    {
+        String[] list = cmdline.split(" ");
+
+        for (String line : list) {
+            if (line.startsWith("lcm"))
+            {
+                return line.substring(6);
+            }
+        }
+
+        return "";
+    }
+
+    // su
+
+    public static String getCmdline(ShellExecuter se)
+    {
+        String command = "su -c cat /proc/cmdline";
+
+        return se.execute(command);
+    }
 }

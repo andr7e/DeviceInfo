@@ -6,8 +6,11 @@ import com.example.andre.androidshell.ShellExecuter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
+import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +29,9 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity
 {
+    // settings
+    public static final String PREF_USE_ROOT_MODE = "user_root_switch";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -74,14 +80,23 @@ public class MainActivity extends AppCompatActivity
 
     public void runApplication(String packageName, String activityName)
     {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setComponent(new ComponentName(packageName,packageName + "." + activityName));
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setComponent(new ComponentName(packageName, packageName + "." + activityName));
+            startActivity(intent);
+        }
+        catch (Exception e)
+        {
+            System.out.print ("Can't run app");
+        }
     }
 
     public void onOpenEngineerMode(View view)
     {
-        runApplication("com.mediatek.engineermode", "EngineerMode");
+        //runApplication("com.mediatek.engineermode", "EngineerMode");
+
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     Pair<String, String> createObj (String key, String value)
@@ -90,10 +105,18 @@ public class MainActivity extends AppCompatActivity
     }
     public void onMyButtonClick(View view)
     {
-        //fillInformatoin();
+        fillInformatoin();
 
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+        //Intent intent = new Intent(this, SettingsActivity.class);
+        //startActivity(intent);
+    }
+
+    public void addItem (ArrayList< Pair<String, String> > objList, String key, String value)
+    {
+        if ( ! value.isEmpty())
+        {
+            objList.add(new Pair<String, String>(key, value));
+        }
     }
 
     public void fillInformatoin()
@@ -111,24 +134,45 @@ public class MainActivity extends AppCompatActivity
 
         ArrayList< Pair<String, String> > objList = new ArrayList< Pair<String, String> >();
 
-        objList.add (new Pair<String, String>("Manufacturer", InfoUtils.getManufacturer()));
-        objList.add (new Pair<String, String>("Model",        InfoUtils.getModel()));
-        objList.add (new Pair<String, String>("Brand",        InfoUtils.getBrand()));
+        addItem(objList, "Manufacturer", InfoUtils.getManufacturer());
+        addItem(objList, "Model",        InfoUtils.getModel());
+        addItem(objList, "Brand",        InfoUtils.getBrand());
 
-        objList.add (new Pair<String, String>("Resolution", getResolution()));
+        addItem(objList, "Resolution", getResolution());
 
-        objList.add (new Pair<String, String>("Platform",   InfoUtils.getPlatform()));
-        //objList.add (new Pair<String, String>("CPU freq", InfoUtils.getCpufreq(exec)));
+        addItem(objList, "Resolution", InfoUtils.getPlatform());
 
-        objList.add (new Pair<String, String>("Android Version", InfoUtils.getAndroidVersion()));
-        objList.add (new Pair<String, String>("API",             InfoUtils.getAndroidAPI()));
+        //addItem(objList, "CPU freq",   InfoUtils.getCpufreq(exec));
 
-        objList.add (new Pair<String, String>("Kernel", InfoUtils.getKernelVersion(exec)));
+        addItem(objList, "Android Version",  InfoUtils.getAndroidVersion());
+        addItem(objList, "API", InfoUtils.getAndroidAPI());
 
-        objList.add (new Pair<String, String>("RAM",        InfoUtils.getRamType(exec)));
-        objList.add (new Pair<String, String>("Flash",  InfoUtils.getFlashName(exec)));
+        addItem(objList, "Kernel", InfoUtils.getKernelVersion(exec));
 
-        objList.add (new Pair<String, String>("Baseband", Build.getRadioVersion()));
+        addItem(objList, "RAM",   InfoUtils.getRamType(exec));
+        addItem(objList, "Flash", InfoUtils.getFlashName(exec));
+
+        addItem(objList, "Baseband", Build.getRadioVersion());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean rootMode = prefs.getBoolean(PREF_USE_ROOT_MODE, false);
+
+        String cmdline = "";
+
+        if (rootMode)
+        {
+            cmdline = InfoUtils.getCmdline(exec);
+
+            if ( ! cmdline.isEmpty())
+            {
+                String lcmName = InfoUtils.getLcmName(cmdline);
+
+                if ( ! lcmName.isEmpty())
+                {
+                    addItem(objList, "LCM", lcmName);
+                }
+            }
+        }
 
         HashMap<String,String>  hash = InfoUtils.getDriversHash(exec);
 
@@ -152,6 +196,11 @@ public class MainActivity extends AppCompatActivity
                 objList.add(new Pair<String, String>(key, value));
             }
         }
+
+        //
+        addItem(objList, "cmdline", cmdline);
+
+        // View
 
         for (int i = 0; i < objList.size(); i++)
         {
