@@ -1,1 +1,1 @@
-# MtkDeviceInfo
+# DeviceInfo
