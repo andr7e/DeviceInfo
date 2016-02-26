@@ -4,7 +4,6 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.example.andre.androidshell.ShellExecuter;
-import com.example.andre.myapplication.BinaryDataHelper;
 
 import java.io.File;
 import java.util.ArrayList;

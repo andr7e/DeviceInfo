@@ -14,10 +14,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Pair;
-import android.view.ContextMenu;
 import android.view.Display;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TableLayout;
@@ -38,7 +36,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fillInformatoin();
+        fillInformation();
     }
 
     public int getScreenWidth ()
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            System.out.println ("Can't run app");
+            System.err.println ("Can't run app");
         }
     }
 
@@ -98,7 +96,7 @@ public class MainActivity extends AppCompatActivity
 
     public void onRefreshButtonClick(View view)
     {
-        fillInformatoin();
+        fillInformation();
     }
 
     public void addItem (ArrayList< Pair<String, String> > objList, String key, String value)
@@ -109,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void fillInformatoin()
+    public void fillInformation()
     {
         ShellExecuter exec = new ShellExecuter();
 

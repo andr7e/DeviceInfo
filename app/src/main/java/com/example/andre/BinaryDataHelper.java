@@ -1,4 +1,4 @@
-package com.example.andre.myapplication;
+package com.example.andre;
 
 import java.io.BufferedInputStream;
 import java.io.File;
