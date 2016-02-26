@@ -10,13 +10,13 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.Display;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -93,22 +93,12 @@ public class MainActivity extends AppCompatActivity
 
     public void onOpenEngineerMode(View view)
     {
-        //runApplication("com.mediatek.engineermode", "EngineerMode");
-
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+        runApplication("com.mediatek.engineermode", "EngineerMode");
     }
 
-    Pair<String, String> createObj (String key, String value)
-    {
-        return new Pair<String, String>(key, value);
-    }
-    public void onMyButtonClick(View view)
+    public void onRefreshButtonClick(View view)
     {
         fillInformatoin();
-
-        //Intent intent = new Intent(this, SettingsActivity.class);
-        //startActivity(intent);
     }
 
     public void addItem (ArrayList< Pair<String, String> > objList, String key, String value)
@@ -236,24 +226,23 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // Menu
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.settings:
-                runApplication("com.mediatek.engineermode", "EngineerMode");
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 }
-

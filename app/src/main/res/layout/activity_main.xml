@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="@string/get_info"
         android:id="@+id/button"
-        android:onClick="onMyButtonClick"
+        android:onClick="onRefreshButtonClick"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
