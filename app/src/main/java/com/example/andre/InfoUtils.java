@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class InfoUtils
 {
     public static final String UNKNOWN       = "Other";
+    public static final String LCM           = "LCM";
     public static final String TOUCHPANEL    = "Touchscreen";
     public static final String ACCELEROMETER = "Accelerometer";
     public static final String ALSPS         = "Als/ps";
@@ -98,6 +99,13 @@ public class InfoUtils
     public static String getRamType (ShellExecuter se)
     {
         String command = "cat /sys/bus/platform/drivers/ddr_type/ddr_type";
+
+        return se.execute(command);
+    }
+
+    public static String getSoundCard (ShellExecuter se)
+    {
+        String command = "cat /proc/asound/card0/id";
 
         return se.execute(command);
     }

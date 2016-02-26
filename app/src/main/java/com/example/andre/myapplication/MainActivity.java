@@ -149,11 +149,10 @@ public class MainActivity extends AppCompatActivity
 
         addItem(objList, "Kernel", InfoUtils.getKernelVersion(exec));
 
-        addItem(objList, "RAM", InfoUtils.getRamType(exec));
-        addItem(objList, "Flash", InfoUtils.getFlashName(exec));
+        //
+        HashMap<String,String>  hash = InfoUtils.getDriversHash(exec);
 
-        addItem(objList, "Baseband", Build.getRadioVersion());
-
+        //
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean rootMode = prefs.getBoolean(PREF_USE_ROOT_MODE, false);
 
@@ -169,17 +168,16 @@ public class MainActivity extends AppCompatActivity
 
                 if ( ! lcmName.isEmpty())
                 {
-                    addItem(objList, "LCM", lcmName);
+                    hash.put(InfoUtils.LCM, lcmName);
                 }
             }
         }
 
-        HashMap<String,String>  hash = InfoUtils.getDriversHash(exec);
-
         String[] keyList = {
-                InfoUtils.TOUCHPANEL,
                 InfoUtils.PMIC,
                 InfoUtils.RTC,
+                InfoUtils.LCM,
+                InfoUtils.TOUCHPANEL,
                 InfoUtils.ACCELEROMETER,
                 InfoUtils.ALSPS,
                 InfoUtils.MAGNETOMETER,
@@ -201,6 +199,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         //
+        addItem(objList, "Sound", InfoUtils.getSoundCard(exec));
+
+        addItem(objList, "RAM",   InfoUtils.getRamType(exec));
+        addItem(objList, "Flash", InfoUtils.getFlashName(exec));
+
+        addItem(objList, "Baseband", Build.getRadioVersion());
+
         addItem(objList, "cmdline", cmdline);
 
         // View
