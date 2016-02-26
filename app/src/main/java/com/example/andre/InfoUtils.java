@@ -1,23 +1,14 @@
 package com.example.andre;
 
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.text.TextUtils;
 
 import com.example.andre.androidshell.ShellExecuter;
 import com.example.andre.myapplication.BinaryDataHelper;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by andrey on 24.02.16.
