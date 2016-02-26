@@ -5,6 +5,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.example.andre.androidshell.ShellExecuter;
+import com.example.andre.myapplication.BinaryDataHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -110,19 +111,6 @@ public class InfoUtils
         return se.execute(command);
     }
 
-    /*
-    public static String[] getDriversList(ShellExecuter se)
-    {
-        String command = "ls cat /sys/bus/i2c/drivers";
-
-        String out = se.execute(command);
-
-        String[] list = out.split("\n");
-
-        return list;
-    }
-    */
-
     public static boolean isActiveDeviceI2C(File dir)
     {
         for (File file : dir.listFiles())
@@ -135,7 +123,7 @@ public class InfoUtils
         return false;
     }
 
-    public static ArrayList<String> getDeviceList(File dir)
+    public static ArrayList<String> getDeviceListI2C(File dir)
     {
         ArrayList<String> list = new ArrayList<String>();
 
@@ -160,7 +148,7 @@ public class InfoUtils
 
         File dir = new File(path);
 
-        ArrayList<String>  list = getDeviceList(dir);
+        ArrayList<String>  list = getDeviceListI2C(dir);
 
         return list.toArray(new String[0]);
     }
@@ -178,152 +166,6 @@ public class InfoUtils
         }
 
         return false;
-    }
-
-    public static List<Byte> readBytes(InputStream in, byte terminator) throws IOException
-    {
-        int BUFFER_SIZE = 1;
-
-        byte[] b = new byte[BUFFER_SIZE];
-
-        List<Byte> outputBytes = new ArrayList<Byte>();
-
-        int offset = 0;
-        int i = 0;
-        int read = 0;
-
-        while (((read = in.read(b)) != -1))
-        {
-            byte mybyte = b[0];
-
-            //System.out.println(mybyte);
-            //System.out.println((char) mybyte);
-
-            if (mybyte == terminator) break;
-
-            outputBytes.add(mybyte);
-
-            offset += read;
-        }
-
-        return outputBytes;
-    }
-
-    public static String bytesToString (byte[] bytes)
-    {
-        String str = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            str = new String(bytes, StandardCharsets.UTF_8);
-        }
-        else
-        {
-            str = new String(bytes, Charset.forName("UTF-8"));
-        }
-
-        return str;
-    }
-
-    public static String byteListToString(List<Byte> bytes)
-    {
-        int count = bytes.size();
-
-        if (count > 0)
-        {
-            byte[] array = new byte[bytes.size()];
-            int i = 0;
-            for (Byte cur : bytes)
-            {
-                array[i] = cur;
-                i++;
-            }
-
-            return bytesToString(array);
-        }
-
-        return "";
-    }
-
-    public static ArrayList<String> getMtkCameraList()
-    {
-        ArrayList<String> cameraList = new ArrayList<String>();
-
-        String fileNmae = "/system/lib/libcameracustom.so";
-
-        System.out.println(fileNmae);
-
-        try
-        {
-            File file = new File(fileNmae);
-
-            String searchPattern = "SENSOR_DRVNAME_";
-
-            InputStream in = null;
-            try
-            {
-                byte[] searchPatternBytes = searchPattern.getBytes();
-
-                int BUFFER_SIZE = 1;
-
-                in = new BufferedInputStream(new FileInputStream(file));
-
-                byte[] b = new byte[BUFFER_SIZE];
-
-                int offset = 0;
-                int i = 0;
-                int read = 0;
-                int matched = 0;
-                while (((read = in.read(b)) != -1))
-                {
-                    //for (int c = 0; c < 4; c++)
-                    //System.out.println(b[c]);
-
-                    offset += read;
-
-                    byte mybyte = b[0];
-
-                    if (matched == searchPattern.length())
-                    {
-                        //System.out.println(mybyte);
-
-                        System.out.println("found");
-
-                        List<Byte> bytes = readBytes(in, (byte) 0);
-
-                        String str = (char)mybyte + byteListToString(bytes);
-
-                        System.out.println(str);
-
-                        cameraList.add(str);
-
-                        matched = 0;
-                    }
-
-                    if (mybyte == searchPatternBytes[matched])
-                    {
-                        matched++;
-                    }
-                    else
-                    {
-                        matched = 0;
-                    }
-
-                    i++;
-                }
-            }
-            finally
-            {
-                if (in != null)
-                {
-                    in.close();
-                }
-            }
-        }
-        catch(Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
-
-        return cameraList;
     }
 
     public static HashMap<String,String> getDriversHash(ShellExecuter se)
@@ -404,12 +246,7 @@ public class InfoUtils
 
         ArrayList<String> mtkCameraList = getMtkCameraList();
 
-        for (String cameraModel : mtkCameraList)
-        {
-            String cameraName = cameraModel.toLowerCase();
-
-            cameraList.add(cameraName);
-        }
+        cameraList.addAll(mtkCameraList);
 
         if ( ! cameraList.isEmpty())   hm.put(InfoUtils.CAMERA,     TextUtils.join("\n", cameraList));
         if ( ! touchList.isEmpty())    hm.put(InfoUtils.TOUCHPANEL, TextUtils.join("\n", touchList));
@@ -421,6 +258,26 @@ public class InfoUtils
         if ( ! otherList.isEmpty())    hm.put(InfoUtils.UNKNOWN,    TextUtils.join("\n", otherList));
 
         return hm;
+    }
+
+    public static ArrayList<String> getMtkCameraList()
+    {
+        String fileName = "/system/lib/libcameracustom.so";
+
+        String searchPattern = "SENSOR_DRVNAME_";
+
+        ArrayList<String> cameraList  = new ArrayList<String>();
+
+        ArrayList<String> mtkCameraList = BinaryDataHelper.getStringCapturedList(fileName, searchPattern);
+
+        for (String cameraModel : mtkCameraList)
+        {
+            String cameraName = cameraModel.toLowerCase();
+
+            cameraList.add(cameraName);
+        }
+
+        return cameraList;
     }
 
     public static String getLcmName(String cmdline)
