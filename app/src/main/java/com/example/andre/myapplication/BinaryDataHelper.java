@@ -75,7 +75,8 @@ public class BinaryDataHelper
         return outputBytes;
     }
 
-    public static ArrayList<String> getStringCapturedList(String fileName, String searchPattern)
+    // maxStopBytes used for reduce time where searched values in near area
+    public static ArrayList<String> getStringCapturedList(String fileName, String searchPattern, int maxStopBytes)
     {
         ArrayList<String> strList = new ArrayList<String>();
 
@@ -100,6 +101,7 @@ public class BinaryDataHelper
                 int i = 0;
                 int read = 0;
                 int matched = 0;
+                int matchedOffset = 0;
                 while (((read = in.read(buffer)) != -1))
                 {
                     offset += read;
@@ -119,6 +121,8 @@ public class BinaryDataHelper
                         strList.add(str);
 
                         matched = 0;
+
+                        matchedOffset = offset;
                     }
 
                     if (curByte == searchPatternBytes[matched])
@@ -129,6 +133,9 @@ public class BinaryDataHelper
                     {
                         matched = 0;
                     }
+
+                    // check if need stop
+                    if (matchedOffset > 0 && offset - matchedOffset > maxStopBytes) break;
 
                     i++;
                 }

@@ -259,7 +259,7 @@ public class InfoUtils
 
         ArrayList<String> cameraList  = new ArrayList<String>();
 
-        ArrayList<String> mtkCameraList = BinaryDataHelper.getStringCapturedList(fileName, searchPattern);
+        ArrayList<String> mtkCameraList = BinaryDataHelper.getStringCapturedList(fileName, searchPattern, 100);
 
         for (String cameraModel : mtkCameraList)
         {
