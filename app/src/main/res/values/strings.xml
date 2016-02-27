@@ -5,6 +5,7 @@
     <string name="title_activity_settings">Settings</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
 
     <!-- Strings related to Settings -->
 
@@ -14,5 +15,14 @@
     <string name="pref_title_use_root">Use root</string>
 
     <string name="pref_description_use_root">Enable more information</string>
+
+    <!-- Strings related to About -->
+    <string name="about_version">version 1.1</string>
+
+    <string name="about_author">author\n
+        Andrey Efremov\n
+        aka andr7e</string>
+
+    <string name="about_bottom">(c) 2016</string>
 
 </resources>
