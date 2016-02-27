@@ -169,13 +169,13 @@ public class InfoUtils
     public static HashMap<String,String> getDriversHash(ShellExecuter se)
     {
         String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI"};
-        String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "MTK-TPD", "-TS"};
+        String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "EKTF", "MSG", "MTK-TPD", "-TS"};
         String[] chargerPrefixList = {"BQ", "FAN", "NCP", "CW"};
-        String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR"};
+        String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR", "CM", "AP", "TMD", "RPR", "TMG", "AL"};
         String[] pmicPrefixList    = {"ACT", "WM", "TPS"};
 
-        String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA"};
-        String[] magnetometerPrefixList   = {"AK", "YAMAHA53"};
+        String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA", "MXC"};
+        String[] magnetometerPrefixList   = {"AK", "YAMAHA53", "BMM", "MMC3", "QMC"};
 
         String[] list = InfoUtils.getDriversList(se);
 
