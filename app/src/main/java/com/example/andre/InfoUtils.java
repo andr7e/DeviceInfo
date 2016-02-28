@@ -115,17 +115,112 @@ public class InfoUtils
         {
             if (file.isDirectory())
             {
-                return true;
+                String name = file.getName();
+
+                if (name.length() > 2)
+                {
+                    if (name.charAt(1) == '-')
+                    {
+                        return true;
+                    }
+                }
             }
         }
         return false;
+    }
+
+    public static String getActiveDeviceI2C(File dir)
+    {
+        for (File file : dir.listFiles())
+        {
+            if (file.isDirectory())
+            {
+                String name = file.getName();
+
+                if (name.length() > 2)
+                {
+                    if (name.charAt(1) == '-')
+                    {
+                        return name;
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    public static boolean isParentDirI2C(String name)
+    {
+        if (name.equals("sensors") || name.equals("lightsensor") || name.equals("cwMcuSensor"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static ArrayList<String> getDeviceListDeepI2C(File dir)
+    {
+        ArrayList<String> list = new ArrayList<String>();
+
+        for (File file : dir.listFiles())
+        {
+            if (file.isDirectory())
+            {
+                String name = file.getName();
+
+                String active = getActiveDeviceI2C(file);
+
+                if ( ! active.isEmpty())
+                {
+                    if (isParentDirI2C(name))
+                    {
+                        // /sys/bus/i2c/drivers/cwMcuSensor/0-003a/subsystem/drivers
+                        //String subPath = dir.getAbsolutePath() + "/" + name + "/" + active + "/subsystem/drivers/";
+
+                        //qcom
+                        //  /sys/bus/i2c/drivers/cwMcuSensor/0-003a/driver/0-003a/subsystem/drivers
+                        String subPath = dir.getAbsolutePath() + "/" + name + "/" + active + "/driver/" + active + "/subsystem/drivers/";
+
+                        System.out.println(subPath);
+
+                        File subDir = new File(subPath);
+
+                        ArrayList<String> subList = getDeviceListI2C(subDir);
+
+                        for (String subName : subList)
+                        {
+                            System.out.println(subName);
+
+                            if ( ! list.contains(subName))
+                            {
+                                if ( ! isParentDirI2C(subName)) list.add(subName);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        System.out.println(name);
+
+                        if ( ! list.contains(name)) list.add(name);
+                    }
+                }
+            }
+        }
+        return list;
     }
 
     public static ArrayList<String> getDeviceListI2C(File dir)
     {
         ArrayList<String> list = new ArrayList<String>();
 
-        for (File file : dir.listFiles())
+        System.out.println(dir);
+
+        File[] files = dir.listFiles();
+
+        if (files == null) return list;
+
+        for (File file : files)
         {
             if (file.isDirectory())
             {
@@ -146,7 +241,7 @@ public class InfoUtils
 
         File dir = new File(path);
 
-        ArrayList<String>  list = getDeviceListI2C(dir);
+        ArrayList<String> list = getDeviceListDeepI2C(dir);
 
         return list.toArray(new String[0]);
     }
@@ -157,7 +252,7 @@ public class InfoUtils
     {
         for (String prefix : prefixList)
         {
-            if (value.startsWith(prefix))
+            if (value.startsWith(prefix) || value.contains("_" + prefix))
             {
                 return true;
             }
@@ -169,10 +264,10 @@ public class InfoUtils
     public static HashMap<String,String> getDriversHash(ShellExecuter se)
     {
         String[] pmicPrefixList    = {"ACT", "WM", "TPS", "MT63", "FAN53555", "NCP6"};
-        String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI"};
+        String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI", "MT9"};
         String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "EKTF", "MSG", "MTK-TPD", "-TS", "SYNAPTIC"};
         String[] chargerPrefixList = {"BQ", "FAN", "NCP", "CW2", "SMB1360"};
-        String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR", "CM", "AP", "TMD", "RPR", "TMG", "AL"};
+        String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR", "CM", "AP", "TMD", "RPR", "TMG", "AL", "US"};
 
 
         String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA", "MXC", "MC", "LSM303D"};
@@ -225,7 +320,7 @@ public class InfoUtils
             {
                 chargerList.add(line);
             }
-            else if (isPrefixMatched(touchPrefixList, value) || value.endsWith("-TS") || value.endsWith("-TPD"))
+            else if (isPrefixMatched(touchPrefixList, value) || value.endsWith("-TS") || value.endsWith("_TS") || value.endsWith("-TPD"))
             {
                 touchList.add(line);
             }
