@@ -168,14 +168,15 @@ public class InfoUtils
 
     public static HashMap<String,String> getDriversHash(ShellExecuter se)
     {
+        String[] pmicPrefixList    = {"ACT", "WM", "TPS", "MT63", "FAN53555", "NCP6"};
         String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI"};
-        String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "EKTF", "MSG", "MTK-TPD", "-TS"};
-        String[] chargerPrefixList = {"BQ", "FAN", "NCP", "CW"};
+        String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "EKTF", "MSG", "MTK-TPD", "-TS", "SYNAPTIC"};
+        String[] chargerPrefixList = {"BQ", "FAN", "NCP", "CW2", "SMB1360"};
         String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR", "CM", "AP", "TMD", "RPR", "TMG", "AL"};
-        String[] pmicPrefixList    = {"ACT", "WM", "TPS"};
+
 
         String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA", "MXC"};
-        String[] magnetometerPrefixList   = {"AK", "YAMAHA53", "BMM", "MMC3", "QMC"};
+        String[] magnetometerPrefixList   = {"AKM", "YAMAHA53", "BMM", "MMC3", "QMC"};
 
         String[] list = InfoUtils.getDriversList(se);
 
@@ -216,7 +217,11 @@ public class InfoUtils
             {
                 magnetometerList.add(line);
             }
-            else if (isPrefixMatched(chargerPrefixList, value))
+            else if (isPrefixMatched(pmicPrefixList, value) || value.contains("REGULATOR") )
+            {
+                pmicList.add(line);
+            }
+            else if (isPrefixMatched(chargerPrefixList, value) || value.contains("CHG") || value.contains("CHANGER"))
             {
                 chargerList.add(line);
             }
@@ -224,15 +229,9 @@ public class InfoUtils
             {
                 touchList.add(line);
             }
-            else if (isPrefixMatched(pmicPrefixList, value))
-            {
-                pmicList.add(line);
-            }
-            else if (value.startsWith("RTC"))
-            {
+            else if (value.startsWith("RTC")) {
                 hm.put(InfoUtils.RTC, line);
-            }
-            else if (isPrefixMatched(cameraPrefixList, value))
+            } else if (isPrefixMatched(cameraPrefixList, value))
             {
                 cameraList.add(line);
             }
@@ -248,12 +247,15 @@ public class InfoUtils
 
         if ( ! cameraList.isEmpty())   hm.put(InfoUtils.CAMERA,     TextUtils.join("\n", cameraList));
         if ( ! touchList.isEmpty())    hm.put(InfoUtils.TOUCHPANEL, TextUtils.join("\n", touchList));
-        if ( ! chargerList.isEmpty())  hm.put(InfoUtils.CHARGER,    TextUtils.join("\n", chargerList));
         if ( ! accelerometerList.isEmpty()) hm.put(InfoUtils.ACCELEROMETER,   TextUtils.join("\n", accelerometerList));
         if ( ! magnetometerList.isEmpty())  hm.put(InfoUtils.MAGNETOMETER,    TextUtils.join("\n", magnetometerList));
         if ( ! alspsList.isEmpty())    hm.put(InfoUtils.ALSPS,      TextUtils.join("\n", alspsList));
         if ( ! pmicList.isEmpty())     hm.put(InfoUtils.PMIC,       TextUtils.join("\n", pmicList));
         if ( ! otherList.isEmpty())    hm.put(InfoUtils.UNKNOWN,    TextUtils.join("\n", otherList));
+
+        if ( ! chargerList.isEmpty())  hm.put(InfoUtils.CHARGER,    TextUtils.join("\n", chargerList));
+        else
+            hm.put(InfoUtils.CHARGER, "USE PMIC");
 
         return hm;
     }
