@@ -221,7 +221,7 @@ public class InfoUtils
             {
                 pmicList.add(line);
             }
-            else if (isPrefixMatched(chargerPrefixList, value) || value.contains("CHG") || value.contains("CHANGER"))
+            else if (isPrefixMatched(chargerPrefixList, value) || value.contains("CHG") || value.contains("CHARGER"))
             {
                 chargerList.add(line);
             }
