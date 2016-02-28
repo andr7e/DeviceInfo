@@ -18,6 +18,7 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        adjustAvailabilityActions();
 
         fillInformation();
     }
@@ -104,6 +107,17 @@ public class MainActivity extends AppCompatActivity
         if ( ! value.isEmpty())
         {
             objList.add(new Pair<String, String>(key, value));
+        }
+    }
+
+    public void adjustAvailabilityActions() {
+        String platform = InfoUtils.getPlatform().toUpperCase();
+
+        if ( ! platform.startsWith("MT"))
+        {
+            Button engineerModeButton = (Button)findViewById(R.id.engineerModeButton);
+
+            engineerModeButton.setVisibility(View.GONE);
         }
     }
 
