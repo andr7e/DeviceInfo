@@ -175,8 +175,8 @@ public class InfoUtils
         String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR", "CM", "AP", "TMD", "RPR", "TMG", "AL"};
 
 
-        String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA", "MXC"};
-        String[] magnetometerPrefixList   = {"AKM", "YAMAHA53", "BMM", "MMC3", "QMC"};
+        String[] accelerometerPrefixList  = {"LIS", "KXT", "BMA", "MMA", "MXC", "MC", "LSM303D"};
+        String[] magnetometerPrefixList   = {"AKM", "YAMAHA53", "BMM", "MMC3", "QMC", "LSM303M"};
 
         String[] list = InfoUtils.getDriversList(se);
 
