@@ -5,7 +5,9 @@ import android.text.TextUtils;
 
 import com.example.andre.androidshell.ShellExecuter;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -109,6 +111,31 @@ public class InfoUtils
         return se.execute(command);
     }
 
+    public static String getFileText (String fileName)
+    {
+        try(BufferedReader br = new BufferedReader(new FileReader(fileName)))
+        {
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+
+            return sb.toString();
+        }
+        catch(Exception e)
+        {
+            System.err.println(e.getMessage());
+        }
+
+        return "";
+    }
+
+    //
+
     public static boolean isActiveDeviceI2C(File dir)
     {
         for (File file : dir.listFiles())
@@ -149,9 +176,19 @@ public class InfoUtils
         return "";
     }
 
-    public static boolean isParentDirI2C(String name)
+    public static boolean isQcomParentDirI2C(String name)
     {
-        if (name.equals("sensors") || name.equals("lightsensor") || name.equals("cwMcuSensor"))
+        if (name.equals("cwMcuSensor"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isRockchipParentDirI2C(String name)
+    {
+        if (name.equals("sensors") || name.equals("lightsensor"))
         {
             return true;
         }
@@ -173,7 +210,7 @@ public class InfoUtils
 
                 if ( ! active.isEmpty())
                 {
-                    if (isParentDirI2C(name))
+                    if (isQcomParentDirI2C(name))
                     {
                         // /sys/bus/i2c/drivers/cwMcuSensor/0-003a/subsystem/drivers
                         //String subPath = dir.getAbsolutePath() + "/" + name + "/" + active + "/subsystem/drivers/";
@@ -194,8 +231,23 @@ public class InfoUtils
 
                             if ( ! list.contains(subName))
                             {
-                                if ( ! isParentDirI2C(subName)) list.add(subName);
+                                if ( ! isQcomParentDirI2C(subName)) list.add(subName);
                             }
+                        }
+                    }
+                    else if (isRockchipParentDirI2C(name))
+                    {
+                        //rk
+                        //  /sys/bus/i2c/drivers/sensors/0-001d/name
+                        String subPath = dir.getAbsolutePath() + "/" + name + "/" + active + "/name";
+
+                        System.out.println(subPath);
+
+                        String subName = getFileText (subPath);
+
+                        if ( ! list.contains(subName))
+                        {
+                            if ( ! isRockchipParentDirI2C(subName)) list.add(subName);
                         }
                     }
                     else
