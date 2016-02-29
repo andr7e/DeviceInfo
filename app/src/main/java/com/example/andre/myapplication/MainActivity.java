@@ -136,13 +136,15 @@ public class MainActivity extends AppCompatActivity
 
         ArrayList< Pair<String, String> > objList = new ArrayList< Pair<String, String> >();
 
+        String platform = InfoUtils.getPlatform();
+
         addItem(objList, "Manufacturer", InfoUtils.getManufacturer());
         addItem(objList, "Model", InfoUtils.getModel());
         addItem(objList, "Brand", InfoUtils.getBrand());
 
         addItem(objList, "Resolution", getResolution());
 
-        addItem(objList, "Platform", InfoUtils.getPlatform());
+        addItem(objList, "Platform", platform);
 
         //addItem(objList, "CPU freq",   InfoUtils.getCpufreq(exec));
 
@@ -209,6 +211,8 @@ public class MainActivity extends AppCompatActivity
         addItem(objList, "Baseband", Build.getRadioVersion());
 
         addItem(objList, "cmdline", cmdline);
+
+        addItem(objList, "Partitions", InfoUtils.getPartitions(platform, exec));
 
         // View
 

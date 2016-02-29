@@ -111,6 +111,44 @@ public class InfoUtils
         return se.execute(command);
     }
 
+    public static boolean isMtkPlatform(String platform)
+    {
+        return platform.toUpperCase().startsWith("MT");
+    }
+
+    public static boolean isRkPlatform(String platform)
+    {
+        return platform.toUpperCase().startsWith("RK");
+    }
+
+    public static String getPartitions (String platform, ShellExecuter se)
+    {
+        if (isRkPlatform(platform))
+        {
+            return getRkPartitions(se);
+        }
+        else if (isMtkPlatform(platform))
+        {
+            return getMtkPartitions(se);
+        }
+
+        return "";
+    }
+
+    public static String getRkPartitions (ShellExecuter se)
+    {
+        String command = "cat /proc/mtd";
+
+        return se.execute(command);
+    }
+
+    public static String getMtkPartitions (ShellExecuter se)
+    {
+        String command = "cat /proc/partinfo";
+
+        return se.execute(command);
+    }
+
     public static String getFileText (String fileName)
     {
         StringBuffer output = new StringBuffer();
@@ -185,7 +223,7 @@ public class InfoUtils
 
     public static boolean isQcomParentDirI2C(String name)
     {
-        if (name.equals("cwMcuSensor"))
+        if (name.equals("CwMcuSensor"))
         {
             return true;
         }
@@ -399,7 +437,7 @@ public class InfoUtils
 
         String platform = getPlatform().toUpperCase();
 
-        if (platform.startsWith("MT"))
+        if (isMtkPlatform(platform))
         {
             ArrayList<String> mtkCameraList = getMtkCameraList();
 
