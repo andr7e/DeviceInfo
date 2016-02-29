@@ -113,25 +113,32 @@ public class InfoUtils
 
     public static String getFileText (String fileName)
     {
-        try(BufferedReader br = new BufferedReader(new FileReader(fileName)))
-        {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
+        StringBuffer output = new StringBuffer();
 
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+
+            int i = 0;
+            String line = "";
+            while ((line = reader.readLine())!= null)
+            {
+                if (i != 0) output.append("\n");
+
+                output.append(line);
+
+                i++;
             }
 
-            return sb.toString();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             System.err.println(e.getMessage());
         }
 
-        return "";
+        String response = output.toString();
+
+        return response;
     }
 
     //
@@ -241,7 +248,7 @@ public class InfoUtils
                         //  /sys/bus/i2c/drivers/sensors/0-001d/name
                         String subPath = dir.getAbsolutePath() + "/" + name + "/" + active + "/name";
 
-                        System.out.println(subPath);
+                        //System.out.println(subPath);
 
                         String subName = getFileText (subPath);
 
@@ -252,7 +259,7 @@ public class InfoUtils
                     }
                     else
                     {
-                        System.out.println(name);
+                        //System.out.println(name);
 
                         if ( ! list.contains(name)) list.add(name);
                     }
@@ -316,7 +323,7 @@ public class InfoUtils
     public static HashMap<String,String> getDriversHash(ShellExecuter se)
     {
         String[] pmicPrefixList    = {"ACT", "WM", "TPS", "MT63", "FAN53555", "NCP6"};
-        String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI", "MT9"};
+        String[] cameraPrefixList  = {"OV", "GC", "SP", "IMX", "S5", "HI", "MT9", "GT2"};
         String[] touchPrefixList   = {"GT", "FT", "S3", "GSL", "EKTF", "MSG", "MTK-TPD", "-TS", "SYNAPTIC"};
         String[] chargerPrefixList = {"BQ", "FAN", "NCP", "CW2", "SMB1360"};
         String[] alspsPrefixList   = {"EPL", "APDS", "STK", "LTR", "CM", "AP", "TMD", "RPR", "TMG", "AL", "US"};
@@ -348,6 +355,10 @@ public class InfoUtils
             {
                 hm.put(InfoUtils.LENS, line);
             }
+            else if (isPrefixMatched(cameraPrefixList, value))
+            {
+                cameraList.add(line);
+            }
             else if (isPrefixMatched(alspsPrefixList, value))
             {
                 alspsList.add(line);
@@ -376,11 +387,9 @@ public class InfoUtils
             {
                 touchList.add(line);
             }
-            else if (value.startsWith("RTC")) {
-                hm.put(InfoUtils.RTC, line);
-            } else if (isPrefixMatched(cameraPrefixList, value))
+            else if (value.startsWith("RTC"))
             {
-                cameraList.add(line);
+                hm.put(InfoUtils.RTC, line);
             }
             else
             {
@@ -388,9 +397,14 @@ public class InfoUtils
             }
         }
 
-        ArrayList<String> mtkCameraList = getMtkCameraList();
+        String platform = getPlatform().toUpperCase();
 
-        cameraList.addAll(mtkCameraList);
+        if (platform.startsWith("MT"))
+        {
+            ArrayList<String> mtkCameraList = getMtkCameraList();
+
+            cameraList.addAll(mtkCameraList);
+        }
 
         if ( ! cameraList.isEmpty())   hm.put(InfoUtils.CAMERA,     TextUtils.join("\n", cameraList));
         if ( ! touchList.isEmpty())    hm.put(InfoUtils.TOUCHPANEL, TextUtils.join("\n", touchList));
