@@ -191,8 +191,11 @@ public class MainActivity extends AppCompatActivity
                 InfoUtils.GYROSCOPE,
                 InfoUtils.CHARGER,
                 InfoUtils.CAMERA,
+                InfoUtils.CAMERA_BACK,
+                InfoUtils.CAMERA_FRONT,
                 InfoUtils.LENS,
                 InfoUtils.SOUND,
+                InfoUtils.MODEM,
                 InfoUtils.UNKNOWN
         };
 
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity
             {
                 String value = hash.get(key);
 
-                objList.add(new Pair<String, String>(key, value));
+                addItem(objList, key, value);
             }
         }
 
@@ -214,7 +217,7 @@ public class MainActivity extends AppCompatActivity
             {
                 String value = mtkhash.get(key);
 
-                objList.add(new Pair<String, String>(key, value));
+                addItem(objList, key, value);
             }
         }
 
