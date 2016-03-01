@@ -28,6 +28,7 @@ public class InfoUtils
     public static final String CAMERA        = "Camera";
     public static final String PMIC          = "PMIC";
     public static final String RTC           = "RTC";
+    public static final String SOUND         = "Sound";
 
     public static String getPlatform()
     {
@@ -149,36 +150,6 @@ public class InfoUtils
         return se.execute(command);
     }
 
-    public static String getFileText (String fileName)
-    {
-        StringBuffer output = new StringBuffer();
-
-        try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-
-            int i = 0;
-            String line = "";
-            while ((line = reader.readLine())!= null)
-            {
-                if (i != 0) output.append("\n");
-
-                output.append(line);
-
-                i++;
-            }
-
-        }
-        catch (Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
-
-        String response = output.toString();
-
-        return response;
-    }
-
     //
 
     public static boolean isActiveDeviceI2C(File dir)
@@ -288,7 +259,7 @@ public class InfoUtils
 
                         //System.out.println(subPath);
 
-                        String subName = getFileText (subPath);
+                        String subName = IOUtil.getFileText (subPath);
 
                         if ( ! list.contains(subName))
                         {
@@ -439,7 +410,7 @@ public class InfoUtils
 
         if (isMtkPlatform(platform))
         {
-            ArrayList<String> mtkCameraList = getMtkCameraList();
+            ArrayList<String> mtkCameraList = MtkUtil.getMtkCameraList();
 
             cameraList.addAll(mtkCameraList);
         }
@@ -457,26 +428,6 @@ public class InfoUtils
             hm.put(InfoUtils.CHARGER, "USE PMIC");
 
         return hm;
-    }
-
-    public static ArrayList<String> getMtkCameraList()
-    {
-        String fileName = "/system/lib/libcameracustom.so";
-
-        String searchPattern = "SENSOR_DRVNAME_";
-
-        ArrayList<String> cameraList  = new ArrayList<String>();
-
-        ArrayList<String> mtkCameraList = BinaryDataHelper.getStringCapturedList(fileName, searchPattern, 100);
-
-        for (String cameraModel : mtkCameraList)
-        {
-            String cameraName = cameraModel.toLowerCase();
-
-            cameraList.add(cameraName);
-        }
-
-        return cameraList;
     }
 
     public static String getLcmName(String cmdline)

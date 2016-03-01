@@ -1,6 +1,7 @@
 package com.example.andre.myapplication;
 
 import com.example.andre.InfoUtils;
+import com.example.andre.MtkUtil;
 import com.example.andre.androidshell.ShellExecuter;
 
 import android.content.ComponentName;
@@ -177,6 +178,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        hash.put(InfoUtils.SOUND, InfoUtils.getSoundCard(exec));
+
         String[] keyList = {
                 InfoUtils.PMIC,
                 InfoUtils.RTC,
@@ -189,6 +192,7 @@ public class MainActivity extends AppCompatActivity
                 InfoUtils.CHARGER,
                 InfoUtils.CAMERA,
                 InfoUtils.LENS,
+                InfoUtils.SOUND,
                 InfoUtils.UNKNOWN
         };
 
@@ -202,9 +206,19 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        //
-        addItem(objList, "Sound", InfoUtils.getSoundCard(exec));
+        HashMap<String,String>  mtkhash = MtkUtil.getProjectDriversHash();
 
+        for (String key : keyList)
+        {
+            if (mtkhash.containsKey(key))
+            {
+                String value = mtkhash.get(key);
+
+                objList.add(new Pair<String, String>(key, value));
+            }
+        }
+
+        //
         addItem(objList, "RAM",   InfoUtils.getRamType(exec));
         addItem(objList, "Flash", InfoUtils.getFlashName(exec));
 
