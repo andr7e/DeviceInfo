@@ -239,7 +239,7 @@ public class InfoUtils
 
                         File subDir = new File(subPath);
 
-                        ArrayList<String> subList = getDeviceListI2C(subDir);
+                        ArrayList<String> subList = getDeviceListQcomI2C(subDir);
 
                         for (String subName : subList)
                         {
@@ -295,6 +295,31 @@ public class InfoUtils
                 String name = file.getName();
 
                 if (isActiveDeviceI2C(file))
+                {
+                    list.add(name);
+                }
+            }
+        }
+        return list;
+    }
+
+    public static ArrayList<String> getDeviceListQcomI2C(File dir)
+    {
+        ArrayList<String> list = new ArrayList<String>();
+
+        System.out.println(dir);
+
+        File[] files = dir.listFiles();
+
+        if (files == null) return list;
+
+        for (File file : files)
+        {
+            if (file.isDirectory())
+            {
+                String name = file.getName();
+
+                //if (isActiveDeviceI2C(file))
                 {
                     list.add(name);
                 }
