@@ -26,9 +26,12 @@ public class InfoUtils
     public static final String CHARGER       = "Charger";
     public static final String LENS          = "Lens";
     public static final String CAMERA        = "Camera";
+    public static final String CAMERA_BACK   = "Camera Back";
+    public static final String CAMERA_FRONT  = "Camera Front";
     public static final String PMIC          = "PMIC";
     public static final String RTC           = "RTC";
     public static final String SOUND         = "Sound";
+    public static final String MODEM         = "Modem";
 
     public static String getPlatform()
     {

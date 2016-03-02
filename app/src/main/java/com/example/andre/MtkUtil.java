@@ -1,5 +1,7 @@
 package com.example.andre;
 
+import android.text.TextUtils;
+
 import com.example.andre.androidshell.ShellExecuter;
 
 import java.util.ArrayList;
@@ -39,13 +41,15 @@ public class MtkUtil
                 "LCM_WIDTH",
                 "CUSTOM_KERNEL_LCM",
                 "CUSTOM_KERNEL_TOUCHPANEL",
-                "CUSTOM_KERNEL_MAIN_IMGSENSOR",
-                "CUSTOM_KERNEL_MAIN_LENS",
+                "CUSTOM_HAL_IMGSENSOR",
+                "CUSTOM_HAL_MAIN_IMGSENSOR",
                 "CUSTOM_HAL_SUB_IMGSENSOR",
+                "CUSTOM_KERNEL_MAIN_LENS",
                 "CUSTOM_KERNEL_SOUND",
                 "CUSTOM_KERNEL_ACCELEROMETER",
                 "CUSTOM_KERNEL_ALSPS",
                 "CUSTOM_KERNEL_MAGNETOMETER",
+                "CUSTOM_MODEM",
                 "COMMENTS"
         };
 
@@ -62,13 +66,17 @@ public class MtkUtil
         {
             return InfoUtils.TOUCHPANEL;
         }
-        if (mtkField.equals("CUSTOM_KERNEL_MAIN_IMGSENSOR"))
+        if (mtkField.equals("CUSTOM_HAL_IMGSENSOR"))
         {
             return InfoUtils.CAMERA;
         }
+        if (mtkField.equals("CUSTOM_HAL_MAIN_IMGSENSOR"))
+        {
+            return InfoUtils.CAMERA_BACK;
+        }
         if (mtkField.equals("CUSTOM_HAL_SUB_IMGSENSOR"))
         {
-            return InfoUtils.CAMERA;
+            return InfoUtils.CAMERA_FRONT;
         }
         if (mtkField.equals("CUSTOM_KERNEL_MAIN_LENS"))
         {
@@ -86,9 +94,17 @@ public class MtkUtil
         {
             return InfoUtils.MAGNETOMETER;
         }
+        if (mtkField.equals("CUSTOM_KERNEL_GYROSCOPE"))
+        {
+            return InfoUtils.GYROSCOPE;
+        }
         if (mtkField.equals("CUSTOM_KERNEL_SOUND"))
         {
             return InfoUtils.SOUND;
+        }
+        if (mtkField.equals("CUSTOM_MODEM"))
+        {
+            return InfoUtils.MODEM;
         }
 
         return "";
@@ -128,7 +144,7 @@ public class MtkUtil
 
                         if (pos != -1)
                         {
-                            value = value.substring(0, pos).trim();
+                            value = value.substring(0, pos);
                         }
 
                         System.out.println(key);
@@ -140,7 +156,14 @@ public class MtkUtil
                             if (key.contains(allowKey))
                             {
                                 String convKey = convertFields (key);
-                                hash.put(convKey, value);
+
+                                System.out.println("!!!!!!!!!!!!!!");
+
+                                String[] valueList = value.trim().split(" ");
+
+                                String res = TextUtils.join("\n", valueList);
+
+                                hash.put(convKey, res);
                                 break;
                             }
                         }

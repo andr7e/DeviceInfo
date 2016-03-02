@@ -122,10 +122,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void fillInformation()
+    void fillTableView (ArrayList< Pair<String, String> > objList)
     {
-        ShellExecuter exec = new ShellExecuter();
-
         TableLayout tableLayout = (TableLayout)findViewById(R.id.tableLayout);
 
         tableLayout.removeAllViews();
@@ -134,6 +132,38 @@ public class MainActivity extends AppCompatActivity
 
         float horMargin = getResources().getDimension(R.dimen.activity_horizontal_margin);
         int screenWidthOffset = getScreenWidth()/2 - Math.round(horMargin);
+
+        // View
+
+        for (int i = 0; i < objList.size(); i++)
+        {
+            Pair<String, String> obj = objList.get(i);
+
+            TableRow row = new TableRow(this);
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+            row.setLayoutParams(lp);
+
+            Context context = getApplicationContext();
+            int color = ContextCompat.getColor(context, R.color.colorBackground);
+            if (i % 2 == 0) row.setBackgroundColor(color);
+
+            TextView text1 = new TextView(this);
+            text1.setText(obj.first);
+
+            TextView text2 = new TextView(this);
+            text2.setText(obj.second);
+            text2.setMaxWidth(screenWidthOffset);
+
+            row.addView(text1);
+            row.addView(text2);
+
+            tableLayout.addView(row,i);
+        }
+    }
+
+    public void fillInformation()
+    {
+        ShellExecuter exec = new ShellExecuter();
 
         ArrayList< Pair<String, String> > objList = new ArrayList< Pair<String, String> >();
 
@@ -191,8 +221,11 @@ public class MainActivity extends AppCompatActivity
                 InfoUtils.GYROSCOPE,
                 InfoUtils.CHARGER,
                 InfoUtils.CAMERA,
+                InfoUtils.CAMERA_BACK,
+                InfoUtils.CAMERA_FRONT,
                 InfoUtils.LENS,
                 InfoUtils.SOUND,
+                InfoUtils.MODEM,
                 InfoUtils.UNKNOWN
         };
 
@@ -202,7 +235,7 @@ public class MainActivity extends AppCompatActivity
             {
                 String value = hash.get(key);
 
-                objList.add(new Pair<String, String>(key, value));
+                addItem(objList, key, value);
             }
         }
 
@@ -214,7 +247,7 @@ public class MainActivity extends AppCompatActivity
             {
                 String value = mtkhash.get(key);
 
-                objList.add(new Pair<String, String>(key, value));
+                addItem(objList, key, value);
             }
         }
 
@@ -228,32 +261,7 @@ public class MainActivity extends AppCompatActivity
 
         addItem(objList, "Partitions", InfoUtils.getPartitions(platform, exec));
 
-        // View
-
-        for (int i = 0; i < objList.size(); i++)
-        {
-            Pair<String, String> obj = objList.get(i);
-
-            TableRow row = new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
-
-            Context context = getApplicationContext();
-            int color = ContextCompat.getColor(context, R.color.colorBackground);
-            if (i % 2 == 0) row.setBackgroundColor(color);
-
-            TextView text1 = new TextView(this);
-            text1.setText(obj.first);
-
-            TextView text2 = new TextView(this);
-            text2.setText(obj.second);
-            text2.setMaxWidth(screenWidthOffset);
-
-            row.addView(text1);
-            row.addView(text2);
-
-            tableLayout.addView(row,i);
-        }
+       fillTableView(objList);
     }
 
     // Menu
