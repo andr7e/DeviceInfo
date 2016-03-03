@@ -1,7 +1,9 @@
 package com.example.andre;
 
+import android.content.res.Resources;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 
 import com.example.andre.androidshell.ShellExecuter;
 
@@ -76,6 +78,34 @@ public class InfoUtils
     public static String getAndroidAPI()
     {
         return Integer.toString(Build.VERSION.SDK_INT);
+    }
+
+    public static String getResolution ()
+    {
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+
+        int width  = metrics.widthPixels;
+        int height = metrics.heightPixels;
+
+        return String.format("%dx%d", height, width);
+    }
+
+    public static int getScreenWidth ()
+    {
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+
+        int width  = metrics.widthPixels;
+
+        return width;
+    }
+
+    public static int getScreenHeight ()
+    {
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+
+        int height = metrics.heightPixels;
+
+        return height;
     }
 
     // Shell

@@ -1,5 +1,6 @@
 package com.example.andre.myapplication;
 
+import com.example.andre.InfoList;
 import com.example.andre.InfoUtils;
 import com.example.andre.MtkUtil;
 import com.example.andre.androidshell.ShellExecuter;
@@ -43,43 +44,6 @@ public class MainActivity extends AppCompatActivity
         fillInformation();
     }
 
-    public int getScreenWidth ()
-    {
-        Display display = getWindowManager().getDefaultDisplay();
-
-        Point size = new Point();
-        display.getSize(size);
-
-        int width = size.x;
-
-        return width;
-    }
-
-    public int getScreenHeight ()
-    {
-        Display display = getWindowManager().getDefaultDisplay();
-
-        Point size = new Point();
-        display.getSize(size);
-
-        int height = size.y;
-
-        return height;
-    }
-
-    public String getResolution ()
-    {
-        Display display = getWindowManager().getDefaultDisplay();
-
-        Point size = new Point();
-        display.getSize(size);
-
-        int width = size.x;
-        int height = size.y;
-
-        return String.format("%dx%d", height, width);
-    }
-
     public void runApplication(String packageName, String activityName)
     {
         try {
@@ -103,18 +67,10 @@ public class MainActivity extends AppCompatActivity
         fillInformation();
     }
 
-    public void addItem (ArrayList< Pair<String, String> > objList, String key, String value)
-    {
-        if ( ! value.isEmpty())
-        {
-            objList.add(new Pair<String, String>(key, value));
-        }
-    }
-
     public void adjustAvailabilityActions() {
         String platform = InfoUtils.getPlatform().toUpperCase();
 
-        if ( ! platform.startsWith("MT"))
+        if ( ! InfoUtils.isMtkPlatform(platform))
         {
             Button engineerModeButton = (Button)findViewById(R.id.engineerModeButton);
 
@@ -122,16 +78,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    void fillTableView (ArrayList< Pair<String, String> > objList)
+    void fillTableView (TableLayout tableLayout, ArrayList< Pair<String, String> > objList)
     {
-        TableLayout tableLayout = (TableLayout)findViewById(R.id.tableLayout);
-
         tableLayout.removeAllViews();
 
         tableLayout.setStretchAllColumns(true);
 
         float horMargin = getResources().getDimension(R.dimen.activity_horizontal_margin);
-        int screenWidthOffset = getScreenWidth()/2 - Math.round(horMargin);
+        int screenWidthOffset = InfoUtils.getScreenWidth()/2 - Math.round(horMargin);
 
         // View
 
@@ -163,105 +117,14 @@ public class MainActivity extends AppCompatActivity
 
     public void fillInformation()
     {
-        ShellExecuter exec = new ShellExecuter();
-
-        ArrayList< Pair<String, String> > objList = new ArrayList< Pair<String, String> >();
-
-        String platform = InfoUtils.getPlatform();
-
-        addItem(objList, "Manufacturer", InfoUtils.getManufacturer());
-        addItem(objList, "Model", InfoUtils.getModel());
-        addItem(objList, "Brand", InfoUtils.getBrand());
-
-        addItem(objList, "Resolution", getResolution());
-
-        addItem(objList, "Platform", platform);
-
-        //addItem(objList, "CPU freq",   InfoUtils.getCpufreq(exec));
-
-        addItem(objList, "Android Version", InfoUtils.getAndroidVersion());
-        addItem(objList, "API", InfoUtils.getAndroidAPI());
-
-        addItem(objList, "Kernel", InfoUtils.getKernelVersion(exec));
-
-        //
-        HashMap<String,String>  hash = InfoUtils.getDriversHash(exec);
-
-        //
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean rootMode = prefs.getBoolean(PREF_USE_ROOT_MODE, false);
 
-        String cmdline = "";
+        ArrayList< Pair<String, String> > objList = InfoList.buildInfoList(rootMode);
 
-        if (rootMode)
-        {
-            cmdline = InfoUtils.getCmdline(exec);
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.tableLayout);
 
-            if ( ! cmdline.isEmpty())
-            {
-                String lcmName = InfoUtils.getLcmName(cmdline);
-
-                if ( ! lcmName.isEmpty())
-                {
-                    hash.put(InfoUtils.LCM, lcmName);
-                }
-            }
-        }
-
-        hash.put(InfoUtils.SOUND, InfoUtils.getSoundCard(exec));
-
-        String[] keyList = {
-                InfoUtils.PMIC,
-                InfoUtils.RTC,
-                InfoUtils.LCM,
-                InfoUtils.TOUCHPANEL,
-                InfoUtils.ACCELEROMETER,
-                InfoUtils.ALSPS,
-                InfoUtils.MAGNETOMETER,
-                InfoUtils.GYROSCOPE,
-                InfoUtils.CHARGER,
-                InfoUtils.CAMERA,
-                InfoUtils.CAMERA_BACK,
-                InfoUtils.CAMERA_FRONT,
-                InfoUtils.LENS,
-                InfoUtils.SOUND,
-                InfoUtils.MODEM,
-                InfoUtils.UNKNOWN
-        };
-
-        for (String key : keyList)
-        {
-            if (hash.containsKey(key))
-            {
-                String value = hash.get(key);
-
-                addItem(objList, key, value);
-            }
-        }
-
-        HashMap<String,String>  mtkhash = MtkUtil.getProjectDriversHash();
-
-        for (String key : keyList)
-        {
-            if (mtkhash.containsKey(key))
-            {
-                String value = mtkhash.get(key);
-
-                addItem(objList, key, value);
-            }
-        }
-
-        //
-        addItem(objList, "RAM",   InfoUtils.getRamType(exec));
-        addItem(objList, "Flash", InfoUtils.getFlashName(exec));
-
-        addItem(objList, "Baseband", Build.getRadioVersion());
-
-        addItem(objList, "cmdline", cmdline);
-
-        addItem(objList, "Partitions", InfoUtils.getPartitions(platform, exec));
-
-       fillTableView(objList);
+        fillTableView(tableLayout, objList);
     }
 
     // Menu
